@@ -1,0 +1,64 @@
+// Track 2 Graphviz: Paradigm Shift Diagram
+// Source: S2 Genre-Specific - Agents (Society of Mind)
+// Render with: dot -Tsvg diagram.dot -o output.svg
+
+digraph ParadigmShift {
+    // Global settings
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif", fontsize=11]
+    edge [fontname="Helvetica,Arial,sans-serif", fontsize=9]
+    rankdir=LR
+    splines=ortho
+
+    // Traditional View subgraph
+    subgraph cluster_old {
+        label="❌ Traditional View: PARTS"
+        labelloc=t
+        style=filled
+        fillcolor="#ffcdd2"
+        color="#c62828"
+
+        P1 [label="Part A", shape=box, style=filled, fillcolor=white]
+        P2 [label="Part B", shape=box, style=filled, fillcolor=white]
+        P3 [label="Part C", shape=box, style=filled, fillcolor=white]
+        W [label="Whole", shape=ellipse, style=filled, fillcolor="#ffcdd2"]
+
+        P1 -> W
+        P2 -> W
+        P3 -> W
+    }
+
+    // Arrow between paradigms
+    Arrow [label="→", shape=plaintext, fontsize=24]
+
+    // Minsky's View subgraph
+    subgraph cluster_new {
+        label="✓ Minsky's View: AGENTS"
+        labelloc=t
+        style=filled
+        fillcolor="#c8e6c9"
+        color="#2e7d32"
+
+        AG1 [label="Agent α", shape=box, style=filled, fillcolor=white]
+        AG2 [label="Agent β", shape=box, style=filled, fillcolor=white]
+        AG3 [label="Agent γ", shape=box, style=filled, fillcolor=white]
+        AGY [label="Agency", shape=ellipse, style=filled, fillcolor="#a5d6a7"]
+        MIND [label="Mind", shape=doubleoctagon, style=filled, fillcolor="#81c784"]
+
+        // Bidirectional signals between agents
+        AG1 -> AG2 [dir=both, label="signal", color="#1976d2"]
+        AG2 -> AG3 [dir=both, label="signal", color="#1976d2"]
+
+        // Agents to Agency
+        AG1 -> AGY
+        AG2 -> AGY
+        AG3 -> AGY
+
+        // Agency to Mind
+        AGY -> MIND
+    }
+
+    // Connect the two views
+    W -> Arrow [style=invis]
+    Arrow -> AG1 [style=invis]
+}

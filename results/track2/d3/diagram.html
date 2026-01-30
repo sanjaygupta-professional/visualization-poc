@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Track 2 D3.js: Paradigm Shift Diagram</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            margin: 20px;
+            background: #fafafa;
+        }
+        .container {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+        .paradigm {
+            padding: 20px;
+            border-radius: 8px;
+            min-width: 280px;
+        }
+        .old-paradigm {
+            background: #ffcdd2;
+            border: 2px solid #c62828;
+        }
+        .new-paradigm {
+            background: #c8e6c9;
+            border: 2px solid #2e7d32;
+        }
+        .paradigm-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .arrow-container {
+            display: flex;
+            align-items: center;
+            font-size: 48px;
+            color: #666;
+            padding-top: 80px;
+        }
+        svg {
+            overflow: visible;
+        }
+        .node rect {
+            stroke-width: 2px;
+        }
+        .node text {
+            font-size: 12px;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+        .link {
+            fill: none;
+            stroke-width: 2px;
+        }
+        .link-label {
+            font-size: 10px;
+            fill: #1976d2;
+        }
+        marker {
+            fill: #666;
+        }
+        .bidirectional {
+            stroke: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Track 2 D3.js: Paradigm Shift Diagram</h2>
+    <p><strong>Source:</strong> S2 Genre-Specific - Agents (Society of Mind)</p>
+
+    <div class="container">
+        <!-- Old Paradigm -->
+        <div class="paradigm old-paradigm">
+            <div class="paradigm-title">❌ Traditional View: PARTS</div>
+            <svg id="old-view" width="240" height="200"></svg>
+        </div>
+
+        <!-- Arrow -->
+        <div class="arrow-container">→</div>
+
+        <!-- New Paradigm -->
+        <div class="paradigm new-paradigm">
+            <div class="paradigm-title">✓ Minsky's View: AGENTS</div>
+            <svg id="new-view" width="280" height="280"></svg>
+        </div>
+    </div>
+
+    <script>
+        // Define arrow marker
+        const defs = d3.select("#old-view").append("defs");
+        defs.append("marker")
+            .attr("id", "arrowhead")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 8)
+            .attr("refY", 0)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#666");
+
+        // OLD PARADIGM - Parts to Whole
+        const oldSvg = d3.select("#old-view");
+
+        const oldNodes = [
+            { id: "P1", label: "Part A", x: 40, y: 40 },
+            { id: "P2", label: "Part B", x: 120, y: 40 },
+            { id: "P3", label: "Part C", x: 200, y: 40 },
+            { id: "W", label: "Whole", x: 120, y: 160, isWhole: true }
+        ];
+
+        const oldLinks = [
+            { source: "P1", target: "W" },
+            { source: "P2", target: "W" },
+            { source: "P3", target: "W" }
+        ];
+
+        // Draw links
+        oldSvg.selectAll(".link")
+            .data(oldLinks)
+            .enter()
+            .append("line")
+            .attr("class", "link")
+            .attr("x1", d => oldNodes.find(n => n.id === d.source).x)
+            .attr("y1", d => oldNodes.find(n => n.id === d.source).y + 15)
+            .attr("x2", d => oldNodes.find(n => n.id === d.target).x)
+            .attr("y2", d => oldNodes.find(n => n.id === d.target).y - 20)
+            .attr("stroke", "#666")
+            .attr("marker-end", "url(#arrowhead)");
+
+        // Draw nodes
+        const oldNodeGroups = oldSvg.selectAll(".node")
+            .data(oldNodes)
+            .enter()
+            .append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+        oldNodeGroups.append("rect")
+            .attr("x", -35)
+            .attr("y", -15)
+            .attr("width", 70)
+            .attr("height", 30)
+            .attr("rx", d => d.isWhole ? 15 : 4)
+            .attr("fill", "white")
+            .attr("stroke", d => d.isWhole ? "#c62828" : "#666");
+
+        oldNodeGroups.append("text")
+            .text(d => d.label);
+
+        // NEW PARADIGM - Agents with signals
+        const newSvg = d3.select("#new-view");
+
+        // Copy marker definition
+        const newDefs = newSvg.append("defs");
+        newDefs.append("marker")
+            .attr("id", "arrowhead-new")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 8)
+            .attr("refY", 0)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#666");
+
+        newDefs.append("marker")
+            .attr("id", "arrowhead-blue")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 8)
+            .attr("refY", 0)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#1976d2");
+
+        const newNodes = [
+            { id: "AG1", label: "Agent α", x: 50, y: 40 },
+            { id: "AG2", label: "Agent β", x: 140, y: 40 },
+            { id: "AG3", label: "Agent γ", x: 230, y: 40 },
+            { id: "AGY", label: "Agency", x: 140, y: 140, isAgency: true },
+            { id: "MIND", label: "Mind", x: 140, y: 230, isMind: true }
+        ];
+
+        // Signal links (bidirectional)
+        const signalLinks = [
+            { source: "AG1", target: "AG2", label: "signal" },
+            { source: "AG2", target: "AG3", label: "signal" }
+        ];
+
+        // Hierarchy links
+        const hierarchyLinks = [
+            { source: "AG1", target: "AGY" },
+            { source: "AG2", target: "AGY" },
+            { source: "AG3", target: "AGY" },
+            { source: "AGY", target: "MIND" }
+        ];
+
+        // Draw signal links with labels
+        signalLinks.forEach(link => {
+            const source = newNodes.find(n => n.id === link.source);
+            const target = newNodes.find(n => n.id === link.target);
+
+            // Forward arrow
+            newSvg.append("line")
+                .attr("class", "link bidirectional")
+                .attr("x1", source.x + 35)
+                .attr("y1", source.y - 5)
+                .attr("x2", target.x - 35)
+                .attr("y2", target.y - 5)
+                .attr("stroke", "#1976d2")
+                .attr("marker-end", "url(#arrowhead-blue)");
+
+            // Backward arrow
+            newSvg.append("line")
+                .attr("class", "link bidirectional")
+                .attr("x1", target.x - 35)
+                .attr("y1", target.y + 5)
+                .attr("x2", source.x + 35)
+                .attr("y2", source.y + 5)
+                .attr("stroke", "#1976d2")
+                .attr("marker-end", "url(#arrowhead-blue)");
+
+            // Label
+            newSvg.append("text")
+                .attr("class", "link-label")
+                .attr("x", (source.x + target.x) / 2)
+                .attr("y", source.y - 15)
+                .attr("text-anchor", "middle")
+                .text(link.label);
+        });
+
+        // Draw hierarchy links
+        hierarchyLinks.forEach(link => {
+            const source = newNodes.find(n => n.id === link.source);
+            const target = newNodes.find(n => n.id === link.target);
+
+            newSvg.append("line")
+                .attr("class", "link")
+                .attr("x1", source.x)
+                .attr("y1", source.y + 15)
+                .attr("x2", target.x)
+                .attr("y2", target.y - (target.isMind ? 25 : 20))
+                .attr("stroke", "#666")
+                .attr("marker-end", "url(#arrowhead-new)");
+        });
+
+        // Draw nodes
+        const newNodeGroups = newSvg.selectAll(".node")
+            .data(newNodes)
+            .enter()
+            .append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+        newNodeGroups.append("rect")
+            .attr("x", -40)
+            .attr("y", -15)
+            .attr("width", 80)
+            .attr("height", 30)
+            .attr("rx", d => d.isAgency || d.isMind ? 15 : 4)
+            .attr("fill", d => d.isMind ? "#81c784" : (d.isAgency ? "#a5d6a7" : "white"))
+            .attr("stroke", d => d.isMind ? "#2e7d32" : "#666")
+            .attr("stroke-width", d => d.isMind ? 3 : 2);
+
+        newNodeGroups.append("text")
+            .text(d => d.label);
+    </script>
+
+    <hr style="margin-top: 40px;">
+    <h3>Metrics</h3>
+    <ul>
+        <li><strong>Lines of code:</strong> ~180 (including HTML structure)</li>
+        <li><strong>Render method:</strong> Open in browser</li>
+        <li><strong>Output format:</strong> SVG (live in DOM)</li>
+        <li><strong>Learning curve:</strong> High (requires JS, D3 API knowledge)</li>
+        <li><strong>Dependencies:</strong> D3.js v7 (CDN)</li>
+    </ul>
+</body>
+</html>
